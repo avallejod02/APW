@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumen de Seguridad DHCP</title>
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <meta name="Author" content="Alba Vallejo">
+        <meta name="Description" content="Resumen sobre las vulnerabilidades, ataques y gestión del protocolo DHCP">
+        <meta name="Keywords" content="DHCP, Seguridad, Vulnerabilidades, Gestión, DDI, IPAM">
+    <link rel="shortcut icon" href="./img/avatar.png"  type="image/x-icon">
+    <style>
+        /* Estilos CSS para una apariencia profesional y legible */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.7;
+            background-color: #f4f7f6; /* Un fondo gris muy claro */
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Contenedor principal para el contenido */
+        .container {
+            max-width: 900px;
+            margin: 2rem auto; /* Centrado y con espacio */
+            padding: 2.5rem;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Sombra sutil */
+            border: 1px solid #ddd;
+        }
+
+        /* Título principal */
+        h1 {
+            color: #0056b3; /* Azul profesional */
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 0;
+            font-size: 2.2rem;
+        }
+
+        /* Títulos de sección */
+        h2 {
+            color: #004a99; /* Azul más oscuro */
+            margin-top: 2.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            font-size: 1.6rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        /* Estilo para las listas */
+        ul {
+            list-style-type: none; /* Quitamos los puntos por defecto */
+            padding-left: 0;
+        }
+
+        /* Estilo para los ítems de la lista */
+        li {
+            background-color: #f9f9f9; /* Fondo ligero para cada ítem */
+            border: 1px solid #eee;
+            border-left: 5px solid #0056b3; /* Barra de acento azul */
+            border-radius: 5px;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Estilo para el texto en negrita (keywords) */
+        strong {
+            color: #003366; /* Azul muy oscuro para énfasis */
+        }
+
+        /* Estilo para párrafos dentro de un ítem de lista (ej. "Consecuencias") */
+        li p {
+            margin-top: 0.8rem;
+            margin-bottom: 0;
+            font-size: 0.95em;
+        }
+
+        /* Adaptación para pantallas pequeñas (móviles) */
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            h2 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="container">
+        <h1>Resumen: Seguridad y Gestión Crítica del Protocolo DHCP</h1>
+
+        <p>El Protocolo de Configuración Dinámica de Host (DHCP) es un protocolo cliente-servidor fundamental, indispensable para que los hosts (incluyendo la creciente cantidad de dispositivos IoT) obtengan automáticamente la configuración de red necesaria, como la dirección IP, la puerta de enlace y la dirección DNS.</p>
+
+        <h2>1. Vulnerabilidades Inherentes al Diseño</h2>
+        <p>El DHCP no fue diseñado originalmente con la seguridad como una consideración principal, lo que lo hace vulnerable a ataques "lucrativos". Las tres vulnerabilidades principales que explotan los atacantes son:</p>
+        <ul>
+            <li><strong>Falta de Autenticación:</strong> El servidor y el cliente no pueden verificar la identidad del otro, permitiendo que nodos maliciosos se hagan pasar por servidores o clientes legítimos.</li>
+            <li><strong>Falta de Confidencialidad:</strong> Los mensajes DHCP se transmiten en texto claro (plaintext) a través de UDP, lo que permite a nodos no autorizados sniffear y obtener conocimiento preciso sobre el estado de la red.</li>
+            <li><strong>Falta de Integridad:</strong> No existen mecanismos incorporados para proteger los mensajes contra cambios no autorizados, lo cual facilita la alteración o la ejecución de ataques de reenvío (replay attacks).</li>
+        </ul>
+
+        <h2>2. Ataques Principales y sus Consecuencias</h2>
+        <p>Las vulnerabilidades de diseño permiten tres tipos de ataques principales, que a su vez causan ataques secundarios:</p>
+        <ul>
+            <li>
+                <strong>Ataque de Servidor DHCP Malicioso (Rogue DHCP Server):</strong> Un atacante configura un servidor falso que intenta responder a las consultas antes que el servidor legítimo.
+                <p><strong>Consecuencias:</strong> Esto puede llevar a ataques Man-in-the-Middle (al inyectar una puerta de enlace maliciosa), Ataques de Phishing (al especificar un DNS malicioso) o Ataques de Denegación de Servicio (DoS) (al proporcionar una IP falsa e inalcanzable). Este ataque puede ser modelado en entornos como GNS3 utilizando herramientas como Yersinia o Ettercap.</p>
+            </li>
+            <li>
+                <strong>Ataque de Agotamiento de DHCP (Starvation):</strong> Un cliente malicioso envía un gran número de solicitudes DHCP utilizando direcciones MAC falsificadas (spoofed) para agotar la reserva completa de direcciones IP del servidor.
+                <p><strong>Consecuencias:</strong> Causa un Ataque de Denegación de Servicio (DoS) al impedir que los clientes legítimos obtengan una dirección IP.</p>
+            </li>
+            <li>
+                <strong>Ataque de Reenvío (Replay Attack):</strong> Un atacante captura un paquete DHCP y lo reenvía más tarde para suplantar a un usuario o servidor legítimo, siendo posible por la falta de un valor de detección de vivacidad (nonce).
+            </li>
+        </ul>
+
+        <h2>3. Contramedidas y Seguridad de Red</h2>
+        <p>Los investigadores han propuesto varias contramedidas para mitigar estos ataques, generalmente enfocadas en la autenticación y el monitoreo:</p>
+        <ul>
+            <li><strong>Autenticación:</strong> Implementar mecanismos como criptografía simétrica (P-DHCP), certificados digitales, EAP o contraseñas de un solo uso (OTP) para verificar la identidad del servidor y del cliente.</li>
+            <li><strong>Seguridad de Capa 2 (DHCP Snooping):</strong> Esta es una técnica esencial de seguridad en switches que mitiga ataques al garantizar que los mensajes de respuesta del servidor (DHCPOFFER, DHCPACK, DHCPNACK) solo sean aceptados a través de interfaces consideradas confiables.</li>
+            <li><strong>Detección:</strong> Uso de sistemas de detección de anomalías o Intrusion Detection Systems (IDS) como MIDES, o soluciones basadas en SDN.</li>
+        </ul>
+
+        <h2>4. Desafíos Operacionales y Gestión (DDI)</h2>
+        <p>Además de los ataques de seguridad, la administración del DHCP enfrenta retos operacionales significativos:</p>
+        <ul>
+            <li><strong>Conflictos de IP:</strong> Ocurren cuando dos o más dispositivos usan la misma IP. Las causas comunes incluyen IPs estáticas mal configuradas que se superponen con rangos DHCP, o la superposición de ámbitos (scope overlaps) entre múltiples servidores. Estos conflictos son difíciles de detectar manualmente y degradan el rendimiento.</li>
+            <li><strong>Fallas de Alta Disponibilidad:</strong> Los sistemas de failover o balanceo de carga, como los configurados en Windows Server 2012, pueden fallar en la emisión de IPs si un servidor se congela o la configuración de reenvío (IP Helper/DHCP forwarding) en los switches es incorrecta.</li>
+            <li><strong>Inestabilidad por Parches:</strong> Las actualizaciones de seguridad (como las de junio de 2025 en Windows Server) pueden introducir fallas intermitentes en el servicio DHCP, obligando a los administradores a reiniciar el servicio o el servidor para restaurar la funcionalidad, destacando el dilema entre seguridad y uptime.</li>
+        </ul>
+
+        <h2>5. La Solución DDI y el Monitoreo Proactivo</h2>
+        <p>La gestión de DHCP, DNS y Direcciones IP (DDI) consume mucho tiempo (un promedio de 49 horas al mes). La solución recomendada para grandes redes empresariales es la adopción de plataformas de Gestión de Direcciones IP (IPAM) o DDI.</p>
+        <p>Estas herramientas especializadas permiten:</p>
+        <ul>
+            <li><strong>Monitoreo Continuo:</strong> Supervisar la utilización del ámbito DHCP y detectar automáticamente conflictos de IP en tiempo real (a través de monitoreo ARP y registros DHCP), previniendo el agotamiento del pool.</li>
+            <li><strong>Detección Rápida:</strong> Proporcionar alertas proactivas para reducir el MTTR (tiempo medio de recuperación).</li>
+            <li><strong>Administración Centralizada:</strong> Estandarizar la configuración de DHCP y DNS para reducir errores manuales, mapear direcciones IP a puertos de switch (Switch Port Mapping) para aislar dispositivos problemáticos y proteger IPs críticas mediante reservaciones.</li>
+        </ul>
+        <p><strong>Software Específico:</strong> Herramientas como Paessler PRTG utilizan sensores dedicados para el monitoreo del DHCP, verificando si el servicio está en funcionamiento y si está asignando direcciones, además de rastrear la disponibilidad del scope.</p>
+
+    </main>
+
+</body>
+</html>
